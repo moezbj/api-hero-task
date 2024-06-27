@@ -1,0 +1,70 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "binary"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int           @id @default(autoincrement())
+  role        ROLE          @default(ADMIN)
+  isActive    Boolean       @default(true)
+  email       String        @unique
+  password    String
+  firstName   String
+  lastName    String
+  company     Company?
+  projects    Project[]
+  participant Participant[]
+}
+
+model Project {
+  id          Int           @id @default(autoincrement())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  title       String
+  description String
+  delivered   Boolean       @default(false)
+  owner       User          @relation(fields: [ownerId], references: [id])
+  ownerId     Int
+  participant Participant[]
+}
+
+model Participant {
+  id       Int     @id @default(autoincrement())
+  projet   Project @relation(fields: [projetId], references: [id])
+  projetId Int
+  user     User    @relation(fields: [userId], references: [id])
+  userId   Int
+
+  @@unique([projetId, userId])
+}
+
+model Token {
+  id      Int        @id @default(autoincrement())
+  token   String
+  user    Int
+  expires DateTime
+  type    TOKEN_TYPE
+}
+
+model Company {
+  name   String
+  user   User   @relation(fields: [userId], references: [id])
+  userId Int    @unique
+}
+
+enum ROLE {
+  ADMIN
+  PARTICIPANT
+}
+
+enum TOKEN_TYPE {
+  REFRESH
+  INITIALIZE
+  FORGET
+  CONFIRM
+}
