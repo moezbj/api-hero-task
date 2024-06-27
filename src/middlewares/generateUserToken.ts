@@ -13,8 +13,6 @@ export async function generateUserToken(
       sub: user,
     }
     const expiresIn = add(new Date(), { minutes: expirationInterval })
-    console.log('step 1', expiresIn.getTime())
-
     jwt.sign(
       payload,
       accessSecret,
@@ -25,8 +23,6 @@ export async function generateUserToken(
         if (error || !token) {
           reject('Unable to generate token')
         } else {
-          console.log('step 1', expiresIn.toISOString())
-
           resolve({ token, expiresIn: expiresIn.toISOString() })
         }
       },
