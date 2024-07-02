@@ -3,6 +3,12 @@ import { gql } from 'graphql-modules'
 export const AuthType = gql`
   type Mutation {
     login(password: String!, email: String!): LoginResponse
+    register(
+      password: String!
+      email: String!
+      firstName: String!
+      lastName: String!
+    ): LoginResponse
   }
   type Auth {
     email: String

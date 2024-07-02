@@ -7,6 +7,14 @@ interface AuthType {
   password: string
 }
 
+interface RegisterType {
+  email: string
+  firstName: string
+  lastName: string
+  company?: string
+  password: string
+}
+
 export const authResolves = {
   Mutation: {
     login: async (parent: any, args: AuthType) => {
@@ -25,6 +33,29 @@ export const authResolves = {
 
       const token = await generateTokenResponse(user.id)
       return { token, user }
+    },
+    register: async (parent: any, args: RegisterType) => {
+      const user = await prisma.user.findFirst({
+        where: { email: args.email },
+      })
+
+      if (user) {
+        throw new Error('USER ALREADY EXISTS')
+      }
+
+      const createdUser = await prisma.user.create({
+        data: {
+          email: args.email,
+          firstName: args.firstName,
+          lastName: args.lastName,
+          role: 'ADMIN',
+          password: args.password,
+        },
+      })
+      console.log('here', createdUser)
+
+      const token = await generateTokenResponse(createdUser.id)
+      return { token, user:createdUser }
     },
   },
 }
