@@ -1,4 +1,4 @@
-import { createModule, gql } from 'graphql-modules'
+import { createModule } from 'graphql-modules'
 import { Workspace } from './workspace.type'
 import { workspaceResolver } from './workspace.resolvers'
 

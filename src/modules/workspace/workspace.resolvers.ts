@@ -23,6 +23,7 @@ export const workspaceResolver = {
       args: any,
       context: InternalAppContext,
     ) => {
+      console.log('context', context)
       const existWorkspace = await prisma.workSpace.findFirst({
         where: {
           name: args.title,
