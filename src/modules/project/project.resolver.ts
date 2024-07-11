@@ -1,5 +1,5 @@
+import { isTokenValid } from '@/middlewares/generateToken'
 import prisma from '../../config/prisma'
-import { Project } from './project.type'
 import { InternalAppContext } from 'graphql-modules/application/application'
 
 export const projectResolver = {
@@ -8,7 +8,9 @@ export const projectResolver = {
       parent: Record<string, any>,
       args: Record<string, any>,
       contextValue: any,
+      info: any,
     ) => {
+      console.log('contextValue', contextValue);
       const list = await prisma.project.findMany({
         where: {
           ownerId: 1,

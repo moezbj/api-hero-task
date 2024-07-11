@@ -1,13 +1,18 @@
+import { getUser } from '../../middlewares/getUser'
+import prisma from '../../config/prisma'
 export const userResolver = {
   Query: {
-    user: {
-      id: (user: any) => user._id,
-      firstName: (user: any) => user.firstName,
-      lastName: (user: any) => user.lastName,
-      email: (user: any) => user.email,
-      isActive: (user: any) => user.isActive,
-      company: (user: any) => user.company,
-      role: (user: any) => user.role,
+    user: async (parent: any, args: any, context: any) => {
+      const { token } = args
+      const verifiedUser = await getUser(token)
+      if (!verifiedUser) throw new Error('Invalid user')
+      const user = await prisma.user.findFirst({
+        where: {
+          id: Number(verifiedUser.sub),
+        },
+      })
+
+      return user
     },
   },
 }

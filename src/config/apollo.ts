@@ -5,29 +5,24 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { application } from '../modules'
 
 import getApp from './express'
-// import { schema } from './schema'
 import { isDev } from './vars'
+import { getUser } from '../middlewares/getUser'
 
 export default async function getServer() {
   const schema = application.createSchemaForApollo()
   const [app, appSchema] = await Promise.all([getApp(), schema])
-
   const httpServer = http.createServer(app)
-
   const server = new ApolloServer({
     schema: appSchema,
     csrfPrevention: false,
     introspection: isDev,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   })
-
   await server.start()
-
   app.use(
     expressMiddleware(server, {
-      context: async ({ req }) => req,
+      context: async ({ req }) => req.headers
     }),
   )
-
   return httpServer
 }

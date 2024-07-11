@@ -10,6 +10,7 @@ export const AuthType = gql`
       lastName: String!
     ): LoginResponse
   }
+
   type Auth {
     email: String
     password: String

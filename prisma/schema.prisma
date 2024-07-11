@@ -9,16 +9,43 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  role        ROLE          @default(ADMIN)
-  isActive    Boolean       @default(true)
-  email       String        @unique
-  password    String
-  firstName   String
-  lastName    String
-  company     Company?
-  projects    Project[]
-  participant Participant[]
+  id           Int            @id @default(autoincrement())
+  role         ROLE           @default(ADMIN)
+  isActive     Boolean        @default(true)
+  email        String         @unique
+  password     String
+  firstName    String
+  lastName     String
+  image        String?
+  company      Company?
+  participant  Participant[]
+  projects     Project[]
+  WorkSpace    WorkSpace[]
+  Collaborator Collaborator[]
+}
+
+model WorkSpace {
+  id          Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  name        String
+  description String
+  image       String?
+  admin        User           @relation(fields: [adminId], references: [id])
+  adminId      Int
+  collaborator Collaborator[]
+  projects     Project[]
+}
+
+model Collaborator {
+  id          Int        @id @default(autoincrement())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  description String
+  WorkSpace   WorkSpace? @relation(fields: [workSpaceId], references: [id])
+  workSpaceId Int?
 }
 
 model Project {
@@ -28,17 +55,19 @@ model Project {
   title       String
   description String
   delivered   Boolean       @default(false)
+  participant Participant[]
   owner       User          @relation(fields: [ownerId], references: [id])
   ownerId     Int
-  participant Participant[]
+  WorkSpace   WorkSpace?    @relation(fields: [workSpaceId], references: [id])
+  workSpaceId Int?
 }
 
 model Participant {
   id       Int     @id @default(autoincrement())
-  projet   Project @relation(fields: [projetId], references: [id])
   projetId Int
-  user     User    @relation(fields: [userId], references: [id])
   userId   Int
+  projet   Project @relation(fields: [projetId], references: [id])
+  user     User    @relation(fields: [userId], references: [id])
 
   @@unique([projetId, userId])
 }
@@ -53,8 +82,8 @@ model Token {
 
 model Company {
   name   String
-  user   User   @relation(fields: [userId], references: [id])
   userId Int    @unique
+  user   User   @relation(fields: [userId], references: [id])
 }
 
 enum ROLE {

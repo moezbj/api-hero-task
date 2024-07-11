@@ -2,10 +2,10 @@ import { gql } from 'graphql-modules'
 
 export const User = gql`
   type Query {
-    user(id: ID!): User
+    user(token: String!): User
   }
   type User {
-    id: String
+    id: Int
     firstName: String
     lastName: String
     email: String

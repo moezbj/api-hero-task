@@ -13,8 +13,34 @@ CREATE TABLE "User" (
     "password" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
+    "image" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "WorkSpace" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "image" TEXT,
+    "adminId" INTEGER NOT NULL,
+
+    CONSTRAINT "WorkSpace_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Collaborator" (
+    "id" SERIAL NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "userId" INTEGER NOT NULL,
+    "description" TEXT NOT NULL,
+    "workSpaceId" INTEGER,
+
+    CONSTRAINT "Collaborator_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -26,6 +52,7 @@ CREATE TABLE "Project" (
     "description" TEXT NOT NULL,
     "delivered" BOOLEAN NOT NULL DEFAULT false,
     "ownerId" INTEGER NOT NULL,
+    "workSpaceId" INTEGER,
 
     CONSTRAINT "Project_pkey" PRIMARY KEY ("id")
 );
@@ -66,7 +93,19 @@ CREATE UNIQUE INDEX "Participant_projetId_userId_key" ON "Participant"("projetId
 CREATE UNIQUE INDEX "Company_userId_key" ON "Company"("userId");
 
 -- AddForeignKey
+ALTER TABLE "WorkSpace" ADD CONSTRAINT "WorkSpace_adminId_fkey" FOREIGN KEY ("adminId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Collaborator" ADD CONSTRAINT "Collaborator_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Collaborator" ADD CONSTRAINT "Collaborator_workSpaceId_fkey" FOREIGN KEY ("workSpaceId") REFERENCES "WorkSpace"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Project" ADD CONSTRAINT "Project_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Project" ADD CONSTRAINT "Project_workSpaceId_fkey" FOREIGN KEY ("workSpaceId") REFERENCES "WorkSpace"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Participant" ADD CONSTRAINT "Participant_projetId_fkey" FOREIGN KEY ("projetId") REFERENCES "Project"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

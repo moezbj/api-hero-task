@@ -29,8 +29,6 @@ export const authResolves = {
       if (user && !user?.isActive) {
         throw new Error('LOGIN.BLOCKED')
       }
-      console.log('here', user)
-
       const token = await generateTokenResponse(user.id)
       return { token, user }
     },
@@ -55,7 +53,13 @@ export const authResolves = {
       console.log('here', createdUser)
 
       const token = await generateTokenResponse(createdUser.id)
-      return { token, user:createdUser }
+      return { token, user: createdUser }
     },
   },
+  /* Query: {
+    profile: (parent: any, args: unknown, context: any) => {
+      console.log('poias', context.req.user)
+      return context.req.user
+    },
+  }, */
 }

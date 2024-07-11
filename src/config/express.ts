@@ -10,6 +10,8 @@ import authorization from '../middlewares/auth';
 import { appsDir } from '../helpers/upload';
 import strategies from './passport';
 import { clientUrl, isDev } from './vars';
+import helmet from 'helmet';
+
 export default async () => {
   const apiLimiter = RateLimit({
     windowMs: 60 * 1000, // 1 minute
@@ -20,6 +22,8 @@ export default async () => {
   app.use(apiLimiter);
   app.use(compress());
   app.use(express.json());
+  app.use(helmet({ contentSecurityPolicy: false, crossOriginEmbedderPolicy: false }));
+
   app.use(express.urlencoded({ extended: true }));
   const gqlUpload = (await import('graphql-upload/graphqlUploadExpress.js'))
     .default;
