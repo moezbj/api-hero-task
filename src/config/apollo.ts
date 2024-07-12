@@ -21,7 +21,7 @@ export default async function getServer() {
   await server.start()
   app.use(
     expressMiddleware(server, {
-      context: async ({ req }) => req.headers
+      context: async ({ req }) => req.headers,
     }),
   )
   return httpServer

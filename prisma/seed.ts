@@ -58,6 +58,27 @@ const userData: Prisma.UserCreateInput[] = [
   },
 ]
 
+const workspaceData: Prisma.WorkSpaceCreateInput[] = [
+  {
+    name: 'wereact',
+    description: 'it dev',
+    createdAt: '2017-08-12',
+    admin: {
+      create: {
+        firstName: 'Alice',
+        lastName: 'william',
+        role: 'ADMIN',
+        email: 'alice@prisma.io',
+        password: '$2a$10$TLtC603wy85MM./ot/pvEec0w2au6sjPaOmLpLQFbxPdpJH9fDwwS', // myPassword42
+
+      },
+    },
+    collaborator: {
+      create: [],
+    },
+  },
+]
+
 async function main() {
   console.log(`Start seeding ...`)
   for (const u of userData) {

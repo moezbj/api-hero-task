@@ -76,7 +76,7 @@ export default prisma.$extends({
         return query(args);
       },
     },
-   /*  token: {
+    token: {
       async create({ args, query }) {
         await hashField(args.data, 'token');
 
@@ -91,6 +91,6 @@ export default prisma.$extends({
 
         return query(args);
       },
-    }, */
+    },
   },
 }) as unknown as typeof prisma;
