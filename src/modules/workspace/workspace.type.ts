@@ -19,9 +19,9 @@ export const Workspace = gql`
     description: String
     createdAt: String
     updatedAt: String
-    admin: Int
+    adminId: Int
     collaborators: [Int]
-    projects: [Int]
+    projects: [Project]
     img: String
   }
 `

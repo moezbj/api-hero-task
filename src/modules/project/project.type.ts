@@ -7,6 +7,7 @@ export const Project = gql`
     description: String
     delivered: Boolean
     owner: Int
+    participant: [User]
   }
 
   type Query {
@@ -28,4 +29,5 @@ export interface ProjectType {
   description: string
   delivered: boolean
   owner: number
+
 }

@@ -1,6 +1,9 @@
 import prisma from '../../config/prisma'
 import bcrypt from 'bcryptjs'
 import { generateTokenResponse } from '../../middlewares/generateUserToken'
+import { getUser } from '../../middlewares/getUser'
+import { isTokenValid } from '../../middlewares/generateToken'
+import { TOKEN_TYPE } from '@prisma/client'
 
 interface AuthType {
   email: string
@@ -54,6 +57,22 @@ export const authResolves = {
 
       const token = await generateTokenResponse(createdUser.id)
       return { token, user: createdUser }
+    },
+    logout: async (parent: any, args: any, contextValue: any) => {
+      const getIdUser = await getUser(contextValue.authorization.split(' ')[1])
+      if (!getIdUser) throw new Error('id not provided')
+      const existUser = await prisma.user.findFirst({
+        where: {
+          id: Number(getIdUser.sub),
+        },
+      })
+      if (!existUser) throw new Error("user dosen't exist")
+      await isTokenValid({
+        token: args.token,
+        type: TOKEN_TYPE.REFRESH,
+        user: existUser.id,
+      })
+      return 'done'
     },
   },
   /* Query: {

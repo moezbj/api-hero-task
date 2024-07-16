@@ -9,6 +9,7 @@ export const AuthType = gql`
       firstName: String!
       lastName: String!
     ): LoginResponse
+    logout(token:String): String
   }
 
   type Auth {
