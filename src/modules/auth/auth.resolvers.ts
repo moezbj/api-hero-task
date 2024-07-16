@@ -2,8 +2,10 @@ import prisma from '../../config/prisma'
 import bcrypt from 'bcryptjs'
 import { generateTokenResponse } from '../../middlewares/generateUserToken'
 import { getUser } from '../../middlewares/getUser'
-import { isTokenValid } from '../../middlewares/generateToken'
+import { generateToken, isTokenValid } from '../../middlewares/generateToken'
 import { TOKEN_TYPE } from '@prisma/client'
+import { sandMail } from '../../utils/mailer'
+import { clientUrl, mailExpiration } from '../../config/vars'
 
 interface AuthType {
   email: string
@@ -53,9 +55,11 @@ export const authResolves = {
           password: args.password,
         },
       })
-      console.log('here', createdUser)
-
       const token = await generateTokenResponse(createdUser.id)
+      await sandMail({
+        to: createdUser.email,
+        text: `welcome to hero task`,
+      })
       return { token, user: createdUser }
     },
     logout: async (parent: any, args: any, contextValue: any) => {
@@ -73,6 +77,56 @@ export const authResolves = {
         user: existUser.id,
       })
       return 'done'
+    },
+    forgotPassword: async (parent: any, args: { email: string }) => {
+      const existUser = await prisma.user.findFirst({
+        where: {
+          email: args.email,
+        },
+      })
+      if (!existUser) throw new Error("user dosen't exist")
+      const { token } = await generateToken(existUser.id, TOKEN_TYPE.FORGET, {
+        days: mailExpiration,
+      })
+
+      let info = await sandMail({
+        from: 'contactmoez93@gmail.com',
+        to: existUser.email,
+        html: `
+        <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clickable Link</title>
+</head>
+<body>
+    <a href="${clientUrl}/reset-password/${existUser.id}/${token}">Click here to reset your password</a>
+</body>
+</html>`,
+      })
+
+      return 'sent'
+    },
+    resetPassword: async (
+      parent: any,
+      args: { password: string; confirm: string; token:string },
+    ) => {
+      const getIdUser = await getUser(args.token)
+      if (!getIdUser) throw new Error('id not provided')
+      const existUser = await prisma.user.findFirst({
+        where: {
+          id: Number(getIdUser.sub),
+        },
+      })
+      if (!existUser) throw new Error("user dosen't exist")
+
+      if (args.password !== args.confirm)
+        throw new Error('passwords do not match')
+
+      await prisma.user.update({
+        where: { id: Number(existUser.id) },
+        data: { password: args.password },
+      })
+      return 'updated'
     },
   },
   /* Query: {

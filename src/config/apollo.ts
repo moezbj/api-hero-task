@@ -6,8 +6,6 @@ import { application } from '../modules'
 
 import getApp from './express'
 import { isDev } from './vars'
-import { getUser } from '../middlewares/getUser'
-
 export default async function getServer() {
   const schema = application.createSchemaForApollo()
   const [app, appSchema] = await Promise.all([getApp(), schema])

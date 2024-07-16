@@ -9,7 +9,9 @@ export const AuthType = gql`
       firstName: String!
       lastName: String!
     ): LoginResponse
-    logout(token:String): String
+    logout(token: String): String
+    forgotPassword(email: String): String
+    resetPassword(password: String, confirm: String, token: String): String
   }
 
   type Auth {

@@ -4,15 +4,16 @@ import { generateTokenResponse } from '../../middlewares/generateUserToken'
 
 export const TokenResolver = {
   Query: {
-    validToken: async (args: any) => {
-      await isTokenValid({
-        token: args.refreshToken,
-        type: 'REFRESH',
-        user: Number(args.user),
+    validToken: async (parent: any, args: any) => {
+      const t = await isTokenValid({
+        token: args.token,
+        type: args.tokenType,
+        user: Number(args.userId),
       })
+      if (!t) throw new Error('Invalid token')
 
       const user = await prisma.user.findFirst({
-        where: { id: Number(args.user) },
+        where: { id: Number(args.userId) },
       })
       if (!user) throw new Error('Invalid token')
 
